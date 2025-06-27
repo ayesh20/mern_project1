@@ -1,7 +1,6 @@
 import express from "express"
 import mongoose from "mongoose"
 import bodyParser from "body-parser"
-import studentRouter from "./routers/studentRouter.js "
 import userRouter from "./Routers/userrouter.js"
 import jwt, { decode } from "jsonwebtoken";
 
@@ -56,7 +55,7 @@ mongoose.connect(connectionString).then(
 
 
 
-app.use("/students",studentRouter)
+
 app.use("/users", userRouter)
 
 

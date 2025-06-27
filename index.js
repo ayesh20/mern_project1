@@ -2,7 +2,10 @@ import express from "express"
 import mongoose from "mongoose"
 import bodyParser from "body-parser"
 import userRouter from "./Routers/userrouter.js"
+import productRouter from"./routers/productRouter.js"
 import jwt, { decode } from "jsonwebtoken";
+import dotenv from "dotenv"
+dotenv.config()
 
 
 const app = express()
@@ -17,7 +20,7 @@ app.use(
         if(value != null){
         const token = value.replace("Bearer ","")
          jwt.verify(token,
-            "cbc-6503",
+            process.env.JWT_SECRET,
             (err,decoded) =>{
 
                 if(decoded == null){
@@ -38,8 +41,7 @@ app.use(
 )
 
 
-const connectionString = "mongodb+srv://admin:123@cluster0.aaydtkx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-
+const connectionString = process.env.MONGO_URI
 
 
 mongoose.connect(connectionString).then(

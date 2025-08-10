@@ -1,12 +1,13 @@
 import express from "express"
 import mongoose from "mongoose"
 import bodyParser from "body-parser"
-import userRouter from "./Routers/userrouter.js"
+
 import productRouter from"./routers/productRouter.js"
 import jwt, { decode } from "jsonwebtoken";
 import dotenv from "dotenv"
 import cors from "cors";
 import orderRouter from "./routers/orderRouter.js"
+import userRouter from "./routers/userRouter.js"
 
 dotenv.config()
 

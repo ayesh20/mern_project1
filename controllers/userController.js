@@ -81,6 +81,17 @@ export function loginuser(req,res){
     )
 }
 
+export function getUser(req,res){
+    if(req.user == null){
+        res.status(404).json({
+                    message : "user not found"
+                })
+    }else{
+        res.json()
+    }
+}
+
+
 export function isAdmin(req){
     
     if(req.user == null){

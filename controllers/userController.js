@@ -15,6 +15,7 @@ export function createUser(req,res){
         firstName : req.body.firstName,
         lastName : req.body.lastName,
         email : req.body.email,
+        phone: req.body.phone || "NOT GIVEN",
         password : passwordHash,
     }
 
@@ -81,15 +82,32 @@ export function loginuser(req,res){
     )
 }
 
-export function getUser(req,res){
-    if(req.user == null){
-        res.status(404).json({
-                    message : "user not found"
-                })
-    }else{
-        res.json()
+export async function getUsers(req, res) {
+    const page = parseInt(req.params.page) || 1;
+    const limit = parseInt(req.params.limit) || 10;
+
+    try {
+        if (isAdmin(req)) {
+            const userCount = await User.countDocuments();
+            const totalPages = Math.ceil(userCount / limit);
+
+            const users = await User.find()
+                .skip((page - 1) * limit)
+                .limit(limit);
+
+            return res.json({
+                users,
+                totalPages,
+            });
+        } else {
+            return res.status(403).json({ message: "Unauthorized access" });
+        }
+    } catch (error) {
+        console.error("Error fetching users:", error);
+        return res.status(500).json({ message: "Failed to fetch users" });
     }
 }
+
 
 
 export function isAdmin(req){

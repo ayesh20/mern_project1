@@ -22,19 +22,45 @@ export async function createProduct(req, res) {
 }
 
 export async function getProducts(req, res) {
-	try {
-		if (isAdmin(req)) {
-			const products = await Product.find();
-			return res.json(products);
-		} else {
-			const products = await Product.find({ isAvailable: true });
-			return res.json(products);
-		}
-	} catch (error) {
-		console.error("Error fetching products:", error);
-		return res.status(500).json({ message: "Failed to fetch products" });
-	}
+    const page = parseInt(req.params.page) || 1;
+    const limit = parseInt(req.params.limit) || 10;
+
+    try {
+        if (isAdmin(req)) {
+            // Count all products
+            const productCount = await Product.countDocuments();
+            const totalPages = Math.ceil(productCount / limit);
+
+            // Paginated fetch
+            const products = await Product.find()
+                .skip((page - 1) * limit)
+                .limit(limit);
+
+            return res.json({
+                products: products,
+                totalPages: totalPages,
+            });
+        } else {
+            // Count only available products
+            const productCount = await Product.countDocuments({ isAvailable: true });
+            const totalPages = Math.ceil(productCount / limit);
+
+            // Paginated fetch
+            const products = await Product.find({ isAvailable: true })
+                .skip((page - 1) * limit)
+                .limit(limit);
+
+            return res.json({
+                products: products,
+                totalPages: totalPages,
+            });
+        }
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        return res.status(500).json({ message: "Failed to fetch products" });
+    }
 }
+
 
 export async function deleteProduct(req, res) {
 	if (!isAdmin(req)) {

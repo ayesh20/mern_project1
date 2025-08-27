@@ -8,6 +8,7 @@ import dotenv from "dotenv"
 import cors from "cors";
 import orderRouter from "./routers/orderRouter.js"
 import userRouter from "./routers/userRouter.js"
+import contactRouter from "./routers/contactRouter.js"
 
 dotenv.config()
 
@@ -64,6 +65,7 @@ mongoose.connect(connectionString).then(
 app.use("/api/users", userRouter)
 app.use("/api/products",productRouter)
 app.use("/api/orders", orderRouter)
+app.use("/api/contact", contactRouter)
 
 
 

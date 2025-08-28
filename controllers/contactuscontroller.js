@@ -1,4 +1,4 @@
-// controllers/contactController.js
+
 import Contact from "../models/contactus.js";
 
 export async function createContact(req, res) {

@@ -138,3 +138,27 @@ export async function getProductInfo(req, res) {
         return
 	}
 }
+
+export async function searchProducts(req, res) {
+    const query = req.params.query;
+
+    try {
+        const products = await Product.find({
+            $or: [
+                { name: { $regex: query, $options: "i" } },
+                { altNames: { $elemMatch: { $regex: query, $options: "i" } } }
+            ],
+            isAvailable: true
+        });
+        
+        // Return consistent format with other functions
+        res.json({
+            products: products,
+            totalPages: 1 // Search results are not paginated
+        });
+    } catch (error) {
+        console.error("Error searching products:", error);
+        res.status(500).json({ message: "Failed to search products" });
+    }
+	
+}

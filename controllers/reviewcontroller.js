@@ -27,6 +27,14 @@ export async function addReview(req, res) {
         const token = authHeader.substring(7);
         let user;
         
+        // Verify token and get user info
+        try {
+            user = getUserFromToken(token);
+        } catch (error) {
+            return res.status(401).json({ 
+                message: "Session expired. Please login again" 
+            });
+        }
         
         // Validation
         if (!productName || !rating || !title || !review) {
@@ -43,13 +51,12 @@ export async function addReview(req, res) {
             });
         }
 
-        // Create new review
+        // Create new review (mapping 'review' from frontend to 'details' in backend)
         const newReview = new Review({
             productName: productName.trim(),
             rating: numericRating.toString(),
             title: title.trim(),
-            details: review.trim(),
-            userId: user.userId || user.id
+            details: review.trim() // Frontend sends 'review', backend saves as 'details'
         });
 
         const savedReview = await newReview.save();
@@ -75,8 +82,7 @@ export async function getProductReviews(req, res) {
         const skip = (page - 1) * limit;
 
         if (!productName) {
-            res.status(400).json({ message: "Product name is required" });
-            return;
+            return res.status(400).json({ message: "Product name is required" });
         }
 
         // Get reviews for specific product
@@ -86,11 +92,10 @@ export async function getProductReviews(req, res) {
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)
-            .select('-userId -__v');
+            .select('-__v');
 
         if (reviews.length === 0) {
-            res.status(404).json({ message: "No reviews found for this product" });
-            return;
+            return res.status(404).json({ message: "No reviews found for this product" });
         }
 
         const totalReviews = await Review.countDocuments({ 
@@ -129,6 +134,5 @@ export async function getProductReviews(req, res) {
     } catch (error) {
         console.error("Error fetching product reviews:", error);
         res.status(500).json({ message: "Failed to retrieve product reviews" });
-        return;
     }
 }
